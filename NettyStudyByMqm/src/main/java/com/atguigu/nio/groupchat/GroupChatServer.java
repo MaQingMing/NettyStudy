@@ -38,12 +38,14 @@ public class GroupChatServer {
         try {
             while (true){
                 int select = selector.select(2000);
-                if (select>0){   //有事件处理
+                if (select>0){
+                    //有事件处理
                     Set<SelectionKey> selectionKeys = selector.selectedKeys();
                     Iterator<SelectionKey> iterator = selectionKeys.iterator();
                     while (iterator.hasNext()){
                         SelectionKey key = iterator.next();
-                        if (key.isAcceptable()){        //说明处理连接状态
+                        if (key.isAcceptable()){
+                            //说明处理连接状态
                             SocketChannel accept = serverSocketChannel.accept();
                             accept.configureBlocking(false);
                             SelectionKey register = accept.register(selector, SelectionKey.OP_READ);
