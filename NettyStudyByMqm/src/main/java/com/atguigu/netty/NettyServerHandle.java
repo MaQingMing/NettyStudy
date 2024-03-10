@@ -7,6 +7,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 
 import java.nio.channels.Channel;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mqm
@@ -31,6 +32,53 @@ public class NettyServerHandle extends ChannelInboundHandlerAdapter {
         System.out.println("server ctx = " + ctx);
         //将msg 装成一个ByteBuf
         //ByteBuf 是netty提供的，不是NIO的ByteBuffer
+
+        //用户自定义事件执行事件 任务提交到TaskQueue
+        try {
+            ctx.channel().eventLoop().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(10*1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //用户自定义事件执行事件,上面有一个任务执行时间是10秒，现在是等待20秒，等待30秒之后才执行该任务
+            ctx.channel().eventLoop().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(20*1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+
+
+        //用户自定义定时任务 任务提交到 ScheduleTaskQueue 中
+        ctx.channel().eventLoop().schedule(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(20*1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        },5, TimeUnit.SECONDS);
+
+
+
         ByteBuf byteBuf=(ByteBuf) msg;
         System.out.println("客户端发送消息是： " + byteBuf.toString(CharsetUtil.UTF_8));
         System.out.println("客户端地址是：  " + ctx.channel().remoteAddress());
